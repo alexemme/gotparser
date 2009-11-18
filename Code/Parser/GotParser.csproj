@@ -49,6 +49,8 @@
     <Compile Include="DAO\IResults.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Websites\LmBookmaker.cs" />
+    <Compile Include="Websites\Pinnacle.cs" />
+    <Compile Include="Websites\StanJames.cs" />
     <Compile Include="Websites\Wsb.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

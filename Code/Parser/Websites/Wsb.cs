@@ -12,6 +12,7 @@ namespace Parser.Websites
     public class Wsb : IParser
     {
         private const string url = "https://www.wsb.co.za/";
+        private const string versusSplit = " vs ";
 
         List<Results> results = new List<Results>();
         WebClient wc = new WebClient();
@@ -140,15 +141,20 @@ namespace Parser.Websites
                                 int k = sItem.IndexOf(">", j);
                                 int l = sItem.IndexOf("<", k);
                                 string bet = sItem.Substring(k + 1, l - k - 1).Trim();
+                                name = name.Replace('+', ' ').ToLower();
+                                string[] nameSplit = name.Split(new string[] { versusSplit }, StringSplitOptions.RemoveEmptyEntries);                                
                                 Results res = new Results()
                                 {
-                                    Name = name.Replace('+', ' ').ToLower(),
+                                    Name = name,
                                     Sport = sport.Replace('+', ' ').ToLower(),
                                     Tournament = tournament.Replace('+', ' ').ToLower(),
                                     Odds = bet.ToLower(),
                                     TimeStamp = DateTime.Now,
                                     Closes = closeTime,
-                                    Description = desc.Replace('+', ' ').ToLower()
+                                    Description = desc.Replace('+', ' ').ToLower(),
+                                    Site = Website,
+                                    Name1 = nameSplit[0].Trim(),
+                                    Name2 = (nameSplit.Length > 1 ? nameSplit[1].Trim() : string.Empty)
                                 };
                                 results.Add(res);
                             }

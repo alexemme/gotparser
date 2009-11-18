@@ -13,6 +13,8 @@ namespace Parser.Websites
     {
         private const string url = "https://www.lmbookmaker.com/";
 
+        private const string versusSplit = " v ";
+
         List<Results> results = new List<Results>();
         WebClient wc = new WebClient();
 
@@ -126,6 +128,7 @@ namespace Parser.Websites
                             a = a.Substring(i, a.Length - i).Replace("<td align=\"center\">", "");
                             i = a.IndexOf("<");
                             string odds = a.Substring(0, i);
+                            string[] nameSplit = name.ToLower().Split(new string[] { versusSplit }, StringSplitOptions.RemoveEmptyEntries);   
                             Results res = new Results()
                             {
                                 Name = name.ToLower(),
@@ -134,7 +137,10 @@ namespace Parser.Websites
                                 Odds = odds,
                                 TimeStamp = DateTime.Now,
                                 Closes = closeTime,
-                                Description = desc.ToLower()
+                                Description = desc.ToLower(),
+                                Site = Website,
+                                Name1 = nameSplit[0].Trim(),
+                                Name2 = (nameSplit.Length > 1 ? nameSplit[1].Trim() : string.Empty)
                             };
                             results.Add(res);
                         }

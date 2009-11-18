@@ -24,30 +24,37 @@ namespace ArbitrageForm
         {
             InitializeComponent();
             start = DateTime.Now;
-            dgr.Text = "processing";
+            dgr.Text = "Processing";
             ParseSite();
         }
 
         private void ParseSite()
         {
-            Wsb wsb = new Wsb();
-            wsb.DataAvailable += new EventHandler(DataIsReady);
-            wsb.Parse();
+            //Pinnacle pinnacle = new Pinnacle();
+            //pinnacle.DataAvailable += new EventHandler(DataIsReady);
+            //pinnacle.Parse();
 
-            LmBookmaker lmb = new LmBookmaker();
-            lmb.DataAvailable += new EventHandler(DataIsReady);
-            lmb.Parse();
+            StanJames stanJames = new StanJames();
+            stanJames.Parse();
+
+            //Wsb wsb = new Wsb();
+            //wsb.DataAvailable += new EventHandler(DataIsReady);
+            //wsb.Parse();
+
+            //LmBookmaker lmb = new LmBookmaker();
+            //lmb.DataAvailable += new EventHandler(DataIsReady);
+            //lmb.Parse();
         }
 
         void DataIsReady(object sender, EventArgs e)
         {
             IParser parser = sender as IParser;
             results.Add(parser.Website, parser.RetrieveData());
-            dgr.Text += string.Format(" Receieved data for {0} \r\n", parser.Website);
+            dgr.Text += string.Format(" Receieved data for {0} Timestamp {1}\r\n", parser.Website, DateTime.Now.Subtract(start).ToString());
             if (results.Keys.Count > 1)
             {
-                MapData();
-                dgr.Text += string.Format("Timestamp {0}", DateTime.Now.Subtract(start).ToString());
+                //MapData();
+                dgr.Text += string.Format("Timestamp {0}\r\n", DateTime.Now.Subtract(start).ToString());
             }
 
             List<string> str = new List<string>();
@@ -67,11 +74,22 @@ namespace ArbitrageForm
             {
                 foreach (var set in diffSets)
                 {
-                    var hope = set.Where(p => p.Sport.ToLower() == baseResult.Sport.ToLower()
-                        && p.Tournament.ToLower() == baseResult.Tournament.ToLower());
+                    var hope = set.Where(p => (p.Sport.Contains(baseResult.Sport) || baseResult.Sport.Contains(p.Sport))
+                        && (p.Name.Contains(baseResult.Name) || baseResult.Name.Contains(p.Name) ||
+                        ((p.Name1 == baseResult.Name1) && (p.Name2 == baseResult.Name2)) ||
+                        ((p.Name1 == baseResult.Name2) && (p.Name2 == baseResult.Name1))
+                        ));
                     if (hope.Count() > 0)
                     {
-                        dgr.Text += string.Format("Match Sport = {0}, Tournament = {1}\rr\n", baseResult.Sport,baseResult.Tournament);
+                        var arb = hope.Where(p => !p.Odds.Contains(baseResult.Odds));
+                        if (arb.Count() > 0)
+                        {
+                            dgr.Text += string.Format("Match Sport = {0}, Tournament = {1}, Name = {2}, Odd = {3} \r\n", baseResult.Sport, baseResult.Tournament, baseResult.Name, baseResult.Odds);
+                            foreach (var sub in hope)
+                            {
+                                dgr.Text += string.Format("\tSport = {0}, Tournament = {1}, Name = {2}, Odd = {3}\r\n", sub.Sport, sub.Tournament, sub.Name, sub.Odds);
+                            }
+                        }
                     }
                 }
             }
