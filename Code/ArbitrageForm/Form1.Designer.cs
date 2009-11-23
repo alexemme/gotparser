@@ -78,6 +78,7 @@
             this.Controls.Add(this.dgr);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.menu.ResumeLayout(false);
             this.ResumeLayout(false);

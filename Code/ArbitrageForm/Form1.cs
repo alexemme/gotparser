@@ -19,24 +19,51 @@ namespace ArbitrageForm
         //private const string url = "https://www.wsb.co.za/allevents.php?tournamentId=8&sortby=1";
         Dictionary<string, List<Results>> results = new Dictionary<string, List<Results>>();
         private DateTime start;
+        Thread pinnacle, stanJames;
 
         public Form1()
         {
             InitializeComponent();
             start = DateTime.Now;
             dgr.Text = "Processing";
+
+            pinnacle = new Thread(new ThreadStart(ParsePinnacle));
+            stanJames = new Thread(new ThreadStart(ParseStanJames));
+            pinnacle.Start();
+            stanJames.Start();
             ParseSite();
         }
 
-        private void ParseSite()
+
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //Pinnacle pinnacle = new Pinnacle();
-            //pinnacle.DataAvailable += new EventHandler(DataIsReady);
-            //pinnacle.Parse();
+            balloon.Dispose();
+            if (pinnacle != null && pinnacle.IsAlive)
+            {
+                pinnacle.Abort();
+            }
+            if (stanJames != null && stanJames.IsAlive)
+            {
+                stanJames.Abort();
+            }
+        }
 
+        private void ParsePinnacle()
+        {
+            Pinnacle pinnacle = new Pinnacle();
+            pinnacle.DataAvailable += new EventHandler(DataIsReady);
+            pinnacle.Parse();
+        }
+
+        private void ParseStanJames()
+        {            
             StanJames stanJames = new StanJames();
+            stanJames.DataAvailable += new EventHandler(DataIsReady);
             stanJames.Parse();
+        }
 
+        private void ParseSite(){
             //Wsb wsb = new Wsb();
             //wsb.DataAvailable += new EventHandler(DataIsReady);
             //wsb.Parse();

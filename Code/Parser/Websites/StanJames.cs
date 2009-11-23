@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Parser.Interfaces;
 using System.Xml.Linq;
+using System.Net;
+using System.IO;
 
 namespace Parser.Websites
 {
@@ -18,12 +20,24 @@ namespace Parser.Websites
 
         public void Parse()
         {
-            ParseTennis();
+            
+            string xml = "http://xml.stanjames.com/";
+            WebClient wc = new WebClient();
+            string data = wc.DownloadString(xml);
+            string[] split = data.Split(new string[]{"</head>"}, StringSplitOptions.None);
+            XDocument html = XDocument.Load(new StringReader(split[1].Replace("<br>", "<br />").Replace("<hr>","<hr />").Replace("</html>","")));
+            var links = (from feed in html.Descendants("body").Descendants("pre").Elements("A")
+                         where !feed.Attribute("HREF").Value.StartsWith("/@") && feed.Attribute("HREF").Value.ToLower().EndsWith("xml")
+                       select feed.Attribute("HREF").Value).ToList();
+            foreach (var link in links)
+            {
+                ParseSport(xml + link);
+            }                       
         }
 
-        private void ParseTennis()
+        private void ParseSport(string url)
         {
-            XDocument xml = XDocument.Load("http://xml.stanjames.com/tennis-mens.XML");//@"C:\WorkHome\gotparser\xml\stanjamestennis-mens.xml");
+            XDocument xml = XDocument.Load(url);//@"C:\WorkHome\gotparser\xml\stanjamestennis-mens.xml");
 
             var info = from feed in xml.Descendants("category")
                        select new
@@ -70,13 +84,19 @@ namespace Parser.Websites
                          };
             
             var resultSet = events.ToList();
+            Console.WriteLine("StanJames");
         }
 
         public event EventHandler DataAvailable;
 
         public List<Parser.DAO.Results> RetrieveData()
         {
-            throw new NotImplementedException();
+            List<Parser.DAO.Results> results = new List<Parser.DAO.Results>();
+            results.Add(new Parser.DAO.Results()
+            {
+                Name = "a"
+            });
+            return results;
         }
 
         #endregion
