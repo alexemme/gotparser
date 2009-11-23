@@ -75,6 +75,7 @@ namespace Parser.Websites
                              }).ToList()
                          };
             var resultSet = events.ToList();
+            Console.WriteLine("Pinnacle");
         }
 
 
@@ -83,7 +84,12 @@ namespace Parser.Websites
 
         public List<Parser.DAO.Results> RetrieveData()
         {
-            throw new NotImplementedException();
+            List<Parser.DAO.Results> results = new List<Parser.DAO.Results>();
+            results.Add(new Parser.DAO.Results()
+            {
+                Name = "b"
+            });
+            return results;
         }
 
         #endregion
